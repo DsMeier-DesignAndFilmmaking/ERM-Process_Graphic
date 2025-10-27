@@ -1,5 +1,5 @@
 /* ========================================
-   Reset & Base Styles
+   Reset & Base Styles - Version 3
    ======================================== */
 
 * {
@@ -9,13 +9,13 @@
 }
 
 :root {
-    /* Color Palette - Matching reference image */
-    --bg-dark: #000000;
+    /* Color Palette - Purdue Branding */
+    --bg-light: #FFFFFF;
     --phase-gold: #BD9D64;
     --text-light: #FFFFFF;
     --text-dark: #000000;
     
-    /* Additional professional colors */
+    /* Additional colors */
     --accent-hover: #D4B682;
     --shadow-light: rgba(255, 255, 255, 0.1);
     --shadow-dark: rgba(0, 0, 0, 0.5);
@@ -29,7 +29,7 @@
 
 body {
     font-family: var(--font-sans);
-    background-color: #FFFFFF;
+    background-color: var(--bg-light);
     color: var(--text-dark);
     line-height: 1.6;
     min-height: 100vh;
@@ -41,31 +41,13 @@ body {
 }
 
 /* ========================================
-   Container & Header
+   Container
    ======================================== */
 
 .container {
     width: 100%;
     max-width: 1400px;
     text-align: center;
-}
-
-header {
-    margin-bottom: 2rem;
-    flex-shrink: 0;
-}
-
-h1 {
-    font-size: 2.5rem;
-    font-weight: 700;
-    margin-bottom: 0.5rem;
-    color: var(--text-dark);
-}
-
-.subtitle {
-    font-size: 1.2rem;
-    color: var(--phase-gold);
-    font-weight: 400;
 }
 
 /* ========================================
@@ -95,12 +77,6 @@ h1 {
     pointer-events: none;
 }
 
-/* Ensure arrows use viewBox that matches container */
-.arrows {
-    viewBox: 0 0 1000 1000;
-    preserveAspectRatio: xMidYMid meet;
-}
-
 /* Steps container - circular layout */
 .steps-container {
     position: relative;
@@ -117,7 +93,8 @@ h1 {
     width: 280px;
     cursor: pointer;
     z-index: 10;
-    transition: z-index 0.3s ease;
+    transition: var(--transition-smooth);
+    transform: translate(-50%, -50%);
 }
 
 /* Step Number Badge */
@@ -138,6 +115,7 @@ h1 {
     color: var(--text-dark);
     z-index: 11;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    transition: var(--transition-smooth);
 }
 
 /* Step Content Container */
@@ -146,7 +124,7 @@ h1 {
     border-radius: 12px;
     padding: 1.5rem;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
-    transition: all 0.3s ease;
+    transition: var(--transition-smooth);
 }
 
 /* Step Header (Phase label + Title) */
@@ -183,19 +161,18 @@ h1 {
 }
 
 /* ========================================
-   Circular Positioning of Steps
+   Arrow Styling & Hover Effects
    ======================================== */
-
-/* Steps positioned dynamically by JavaScript for perfect circle */
 
 /* Arrow path styling with smooth transitions */
 .arrow-path {
     transition: stroke 0.3s ease, stroke-width 0.3s ease;
     cursor: pointer;
+    pointer-events: all;
 }
 
 .arrow-path.highlighted {
-    filter: drop-shadow(0 0 4px rgba(212, 182, 130, 0.6));
+    filter: drop-shadow(0 0 6px rgba(212, 182, 130, 0.8));
 }
 
 /* Step hover effects */
@@ -204,16 +181,20 @@ h1 {
 }
 
 .step:hover .step-content {
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
-    transform: scale(1.02);
-    transition: all 0.3s ease;
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.5);
+    transform: scale(1.05);
 }
 
-/* ========================================
-   Hover Effects & Interactions (Removed)
-   ======================================== */
+.step:hover .step-number {
+    transform: translateX(-50%) scale(1.15);
+    background-color: var(--accent-hover);
+}
 
-/* Hover effects removed as requested */
+.step.highlighted .step-content {
+    background-color: var(--accent-hover);
+}
+
+/* Focus accessibility */
 .step:focus {
     outline: 3px solid var(--accent-hover);
     outline-offset: 4px;
@@ -233,10 +214,6 @@ h1 {
     .step {
         width: 240px;
     }
-
-    h1 {
-        font-size: 2rem;
-    }
 }
 
 /* Mobile */
@@ -245,21 +222,9 @@ h1 {
         padding: 1rem;
     }
 
-    header {
-        margin-bottom: 2rem;
-    }
-
-    h1 {
-        font-size: 1.75rem;
-    }
-
-    .subtitle {
-        font-size: 1rem;
-    }
-
     .process-container {
         max-width: 100%;
-        min-height: 600px;
+        min-height: 500px;
     }
 
     .step {
@@ -286,21 +251,10 @@ h1 {
         font-size: 1rem;
         top: -15px;
     }
-
-    /* Adjust positioning for smaller screens */
-    /* Positioning automatically adjusted for 4-step layout */
 }
 
 /* Very Small Mobile */
 @media (max-width: 480px) {
-    h1 {
-        font-size: 1.5rem;
-    }
-
-    .subtitle {
-        font-size: 0.9rem;
-    }
-
     .step {
         width: 180px;
     }
@@ -329,5 +283,7 @@ h1 {
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     }
 
-
+    .step:hover .step-content {
+        transform: none;
+    }
 }
