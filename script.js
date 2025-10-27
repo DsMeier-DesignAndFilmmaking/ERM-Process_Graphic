@@ -1,6 +1,6 @@
 /**
  * ERM Process Diagram - JavaScript
- * Handles dynamic arrow generation and interactive features
+ * Handles dynamic arrow generation with perfect circular flow using SVG paths
  */
 
 (function() {
@@ -9,14 +9,54 @@
     // Configuration
     const CONFIG = {
         arrowColor: '#BD9D64',
-        arrowThickness: 3,
-        arrowAnimation: true,
-        hoverGlow: true
+        arrowThickness: 4,
+        arrowOffset: 40, // Distance from card center for arrow start/end
+        hoverGlowColor: '#D4B682',
+        hoverGlowThickness: 5
     };
 
     // DOM Elements
     let arrowsSVG;
     let steps;
+
+    /**
+     * Position steps in a perfect circle
+     */
+    function positionStepsInCircle() {
+        const container = document.querySelector('.process-container');
+        const containerRect = container.getBoundingClientRect();
+        
+        // Get the actual usable width and height
+        const containerWidth = containerRect.width;
+        const containerHeight = containerRect.height;
+        
+        // Use the smaller dimension as the base for a square
+        const size = Math.min(containerWidth, containerHeight);
+        
+        // Center coordinates
+        const centerX = containerWidth / 2;
+        const centerY = containerHeight / 2;
+        
+        // Radius for the circle (adjust to fit all 4 cards nicely)
+        const radius = size * 0.35;
+        
+        steps.forEach((step, index) => {
+            // Calculate angle for each step (starting from top, going clockwise)
+            // For 4 steps: 0° (top), 90° (right), 180° (bottom), 270° (left)
+            const angle = (index * (360 / steps.length) - 90) * (Math.PI / 180);
+            
+            // Calculate position on circle
+            const x = centerX + Math.cos(angle) * radius;
+            const y = centerY + Math.sin(angle) * radius;
+            
+            // Position the step relative to the container
+            step.style.left = (x / containerWidth * 100) + '%';
+            step.style.top = (y / containerHeight * 100) + '%';
+            step.style.transform = 'translate(-50%, -50%)';
+        });
+        
+        return { centerX, centerY, radius };
+    }
 
     /**
      * Initialize the diagram
@@ -30,8 +70,9 @@
             return;
         }
 
-        // Generate arrows after a small delay to ensure layout is ready
+        // Position steps and generate arrows after a small delay to ensure layout is ready
         setTimeout(() => {
+            positionStepsInCircle();
             generateArrows();
             attachEventListeners();
         }, 100);
@@ -45,25 +86,42 @@
         const arrowDefs = createArrowMarker(svgNS);
         arrowsSVG.appendChild(arrowDefs);
 
-        // Get step positions
-        const stepPositions = Array.from(steps).map(step => {
-            const rect = step.getBoundingClientRect();
-            const containerRect = step.closest('.process-container').getBoundingClientRect();
+        // Calculate container center
+        const container = document.querySelector('.process-container');
+        const containerRect = container.getBoundingClientRect();
+        const containerWidth = containerRect.width;
+        const containerHeight = containerRect.height;
+        const size = Math.min(containerWidth, containerHeight);
+        
+        // Center coordinates
+        const centerX = containerWidth / 2;
+        const centerY = containerHeight / 2;
+        
+        // Calculate radius for perfect circle
+        const radius = size * 0.35;
+        
+        // Calculate positions for each step on the circle
+        const stepPositions = Array.from(steps).map((step, index) => {
+            // Calculate angle for each step (starting from top, going clockwise)
+            const angle = (index * (360 / steps.length) - 90) * (Math.PI / 180);
             
             return {
-                centerX: rect.left + rect.width / 2 - containerRect.left,
-                centerY: rect.top + rect.height / 2 - containerRect.top
+                centerX: centerX + Math.cos(angle) * radius,
+                centerY: centerY + Math.sin(angle) * radius
             };
         });
 
-        // Generate arrows between consecutive steps
+        // Generate arrows between consecutive steps with smooth Bezier curves
         for (let i = 0; i < stepPositions.length; i++) {
             const current = stepPositions[i];
             const next = stepPositions[(i + 1) % stepPositions.length];
             
-            const path = createCurvedArrow(svgNS, current, next, i);
+            const path = createCurvedArrow(svgNS, current, next, i, centerX, centerY, radius, i);
             arrowsSVG.appendChild(path);
         }
+        
+        // Add hover effect listeners to paths
+        attachArrowHoverEffects();
     }
 
     /**
@@ -91,67 +149,118 @@
     }
 
     /**
-     * Create a curved arrow path between two points
+     * Create a smooth curved arrow path using cubic Bézier curves for perfect circular flow
      */
-    function createCurvedArrow(svgNS, from, to, index) {
+    function createCurvedArrow(svgNS, from, to, index, centerX, centerY, radius, stepIndex) {
+        // Calculate angles from center
+        const fromAngle = Math.atan2(from.centerY - centerY, from.centerX - centerX);
+        const toAngle = Math.atan2(to.centerY - centerY, to.centerX - centerX);
+        
+        // Calculate angle difference
+        let angleDiff = toAngle - fromAngle;
+        if (angleDiff < 0) angleDiff += 2 * Math.PI;
+        
+        // Use arc for better circular flow, but with cubic bezier for smoother curves
+        // Calculate control points that extend outward for smooth curve
+        const controlPointRadius = radius * 1.15; // Extend control points outward
+        
+        const startAngle = fromAngle;
+        const endAngle = toAngle;
+        const midAngle = (startAngle + endAngle) / 2;
+        
+        // Calculate start and end points with offset from card centers
+        const startX = centerX + Math.cos(startAngle) * (radius - CONFIG.arrowOffset);
+        const startY = centerY + Math.sin(startAngle) * (radius - CONFIG.arrowOffset);
+        
+        const endX = centerX + Math.cos(endAngle) * (radius - CONFIG.arrowOffset);
+        const endY = centerY + Math.sin(endAngle) * (radius - CONFIG.arrowOffset);
+        
+        // Create cubic bezier control points for smooth curve
+        const control1X = centerX + Math.cos(startAngle) * controlPointRadius;
+        const control1Y = centerY + Math.sin(startAngle) * controlPointRadius;
+        const control2X = centerX + Math.cos(endAngle) * controlPointRadius;
+        const control2Y = centerY + Math.sin(endAngle) * controlPointRadius;
+        
+        // Create smooth cubic Bezier curve path
+        const pathData = `M ${startX} ${startY} C ${control1X} ${control1Y}, ${control2X} ${control2Y}, ${endX} ${endY}`;
+        
+        // Create main path element
         const path = document.createElementNS(svgNS, 'path');
-        
-        // Calculate control points for curved path
-        const dx = to.centerX - from.centerX;
-        const dy = to.centerY - from.centerY;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-        
-        // Adjust control point based on step position
-        const curvature = 0.3;
-        const controlX = (from.centerX + to.centerX) / 2 + Math.cos(Math.PI / 3) * distance * curvature;
-        const controlY = (from.centerY + to.centerY) / 2 + Math.sin(Math.PI / 3) * distance * curvature;
-        
-        // Adjust start and end points to be closer to step centers
-        const offset = 20;
-        const angle = Math.atan2(dy, dx);
-        const startX = from.centerX + Math.cos(angle) * offset;
-        const startY = from.centerY + Math.sin(angle) * offset;
-        
-        const reverseAngle = Math.atan2(to.centerY - from.centerY, to.centerX - from.centerX);
-        const endX = to.centerX - Math.cos(reverseAngle) * offset;
-        const endY = to.centerY - Math.sin(reverseAngle) * offset;
-        
-        // Create quadratic Bezier curve
-        const pathData = `M ${startX} ${startY} Q ${controlX} ${controlY} ${endX} ${endY}`;
-        
         path.setAttribute('d', pathData);
         path.setAttribute('fill', 'none');
         path.setAttribute('stroke', CONFIG.arrowColor);
         path.setAttribute('stroke-width', CONFIG.arrowThickness);
         path.setAttribute('marker-end', 'url(#arrowhead)');
-        path.setAttribute('opacity', '1.0');
-        
-        // Add hover glow effect if enabled
-        if (CONFIG.hoverGlow) {
-            path.classList.add('arrow-path');
-        }
-        
-        // Add animation class if enabled
-        if (CONFIG.arrowAnimation) {
-            path.classList.add('animated');
-        }
+        path.classList.add('arrow-path');
+        path.dataset.stepIndex = stepIndex;
         
         return path;
     }
 
     /**
-     * Attach event listeners to steps (simplified - no hover effects)
+     * Attach event listeners to steps with hover effects
      */
     function attachEventListeners() {
-        // Event listeners removed as requested - no hover effects
         steps.forEach((step, index) => {
-            // Keyboard support only
+            // Add hover effect for the card
+            step.addEventListener('mouseenter', function() {
+                highlightStepArrow(index);
+            });
+            
+            step.addEventListener('mouseleave', function() {
+                removeArrowHighlights();
+            });
+            
+            // Keyboard support
             step.addEventListener('keydown', function(e) {
                 if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
                     console.log(`Selected step ${index + 1}`);
                 }
             });
+        });
+    }
+    
+    /**
+     * Attach hover effects to arrow paths
+     */
+    function attachArrowHoverEffects() {
+        const arrowPaths = document.querySelectorAll('.arrow-path');
+        arrowPaths.forEach(path => {
+            path.addEventListener('mouseenter', function() {
+                const stepIndex = parseInt(this.dataset.stepIndex);
+                highlightStepArrow(stepIndex);
+            });
+            
+            path.addEventListener('mouseleave', function() {
+                removeArrowHighlights();
+            });
+        });
+    }
+    
+    /**
+     * Highlight arrow when hovering over a step
+     */
+    function highlightStepArrow(stepIndex) {
+        const arrowPaths = document.querySelectorAll('.arrow-path');
+        arrowPaths.forEach((path, index) => {
+            if (index === stepIndex) {
+                path.setAttribute('stroke', CONFIG.hoverGlowColor);
+                path.setAttribute('stroke-width', CONFIG.hoverGlowThickness);
+                path.classList.add('highlighted');
+            }
+        });
+    }
+    
+    /**
+     * Remove arrow highlights
+     */
+    function removeArrowHighlights() {
+        const arrowPaths = document.querySelectorAll('.arrow-path');
+        arrowPaths.forEach(path => {
+            path.setAttribute('stroke', CONFIG.arrowColor);
+            path.setAttribute('stroke-width', CONFIG.arrowThickness);
+            path.classList.remove('highlighted');
         });
     }
 
@@ -166,7 +275,8 @@
             const existingArrows = arrowsSVG.querySelectorAll('defs, path');
             existingArrows.forEach(el => el.remove());
             
-            // Regenerate arrows
+            // Reposition steps and regenerate arrows
+            positionStepsInCircle();
             generateArrows();
         }, 250);
     });

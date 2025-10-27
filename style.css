@@ -29,11 +29,12 @@
 
 body {
     font-family: var(--font-sans);
-    background-color: var(--bg-dark);
-    color: var(--text-light);
+    background-color: #FFFFFF;
+    color: var(--text-dark);
     line-height: 1.6;
     min-height: 100vh;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     padding: 2rem;
@@ -50,14 +51,15 @@ body {
 }
 
 header {
-    margin-bottom: 3rem;
+    margin-bottom: 2rem;
+    flex-shrink: 0;
 }
 
 h1 {
     font-size: 2.5rem;
     font-weight: 700;
     margin-bottom: 0.5rem;
-    color: var(--text-light);
+    color: var(--text-dark);
 }
 
 .subtitle {
@@ -76,6 +78,10 @@ h1 {
     max-width: 900px;
     margin: 0 auto;
     aspect-ratio: 1;
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 /* SVG for arrows - covers entire container */
@@ -87,6 +93,12 @@ h1 {
     height: 100%;
     z-index: 1;
     pointer-events: none;
+}
+
+/* Ensure arrows use viewBox that matches container */
+.arrows {
+    viewBox: 0 0 1000 1000;
+    preserveAspectRatio: xMidYMid meet;
 }
 
 /* Steps container - circular layout */
@@ -103,8 +115,9 @@ h1 {
 .step {
     position: absolute;
     width: 280px;
-    cursor: default;
+    cursor: pointer;
     z-index: 10;
+    transition: z-index 0.3s ease;
 }
 
 /* Step Number Badge */
@@ -133,6 +146,7 @@ h1 {
     border-radius: 12px;
     padding: 1.5rem;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+    transition: all 0.3s ease;
 }
 
 /* Step Header (Phase label + Title) */
@@ -172,32 +186,27 @@ h1 {
    Circular Positioning of Steps
    ======================================== */
 
-/* Step 1: Top */
-.step-1 {
-    top: 10%;
-    left: 50%;
-    transform: translateX(-50%);
+/* Steps positioned dynamically by JavaScript for perfect circle */
+
+/* Arrow path styling with smooth transitions */
+.arrow-path {
+    transition: stroke 0.3s ease, stroke-width 0.3s ease;
+    cursor: pointer;
 }
 
-/* Step 2: Right */
-.step-2 {
-    top: 50%;
-    right: 10%;
-    transform: translateY(-50%);
+.arrow-path.highlighted {
+    filter: drop-shadow(0 0 4px rgba(212, 182, 130, 0.6));
 }
 
-/* Step 3: Bottom */
-.step-3 {
-    bottom: 10%;
-    left: 50%;
-    transform: translateX(-50%);
+/* Step hover effects */
+.step:hover {
+    z-index: 20;
 }
 
-/* Step 4: Left */
-.step-4 {
-    top: 50%;
-    left: 10%;
-    transform: translateY(-50%);
+.step:hover .step-content {
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+    transform: scale(1.02);
+    transition: all 0.3s ease;
 }
 
 /* ========================================
