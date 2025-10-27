@@ -120,7 +120,6 @@
 
     /**
      * Generate smooth cubic Bezier curve arrows connecting the steps
-     * Lines are clipped by card edges to create clean segments
      */
     function generateArrows(circleData) {
         const svgNS = 'http://www.w3.org/2000/svg';
@@ -135,42 +134,21 @@
         const angleIncrement = (2 * Math.PI) / numSteps;
         const startAngle = -Math.PI / 2;
         
-        // Calculate arrow radius (circle path - cards are on this radius)
-        const arrowRadius = radius;
+        // Calculate arrow radius (circle minus offset)
+        const arrowRadius = radius - CONFIG.arrowOffset;
         
-        // Generate arrows along the perfect circle with card edge clipping
+        // Generate arrows along the perfect circle
         for (let i = 0; i < numSteps; i++) {
             const currentAngle = startAngle + (angleIncrement * i);
             const nextAngle = startAngle + (angleIncrement * ((i + 1) % numSteps));
             
-            // Get card dimensions to calculate clipping points
-            const currentStep = steps[i];
-            const stepRect = currentStep.getBoundingClientRect();
-            const cardWidth = stepRect.width;
-            const cardHeight = stepRect.height;
-            
-            // Calculate how far the card extends in each direction
-            // Half the card width/height represents the margin from center
-            const cardMargin = cardWidth / 3; // Distance from card center to edge
-            
-            // Calculate start point: on the circle but outside the current card edge
-            // Move away from card along the radius
-            const startOffset = arrowRadius + cardMargin;
-            const startX = centerX + Math.cos(currentAngle) * startOffset;
-            const startY = centerY + Math.sin(currentAngle) * startOffset;
-            
-            // Calculate end point: on the circle but outside the next card edge
-            const nextStep = steps[(i + 1) % numSteps];
-            const nextStepRect = nextStep.getBoundingClientRect();
-            const nextCardWidth = nextStepRect.width;
-            const nextCardMargin = nextCardWidth / 3;
-            
-            const endOffset = arrowRadius + nextCardMargin;
-            const endX = centerX + Math.cos(nextAngle) * endOffset;
-            const endY = centerY + Math.sin(nextAngle) * endOffset;
+            // Calculate start and end points on the circle
+            const startX = centerX + Math.cos(currentAngle) * arrowRadius;
+            const startY = centerY + Math.sin(currentAngle) * arrowRadius;
+            const endX = centerX + Math.cos(nextAngle) * arrowRadius;
+            const endY = centerY + Math.sin(nextAngle) * arrowRadius;
             
             // Create arc path along the circle
-            // Use the full circle radius for the arc
             // Large arc flag: 0 for arcs < 180 degrees, 1 for arcs >= 180 degrees
             const largeArcFlag = angleIncrement > Math.PI ? 1 : 0;
             
