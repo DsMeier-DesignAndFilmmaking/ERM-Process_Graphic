@@ -1,0 +1,324 @@
+/* ========================================
+   Reset & Base Styles
+   ======================================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    /* Color Palette - Matching reference image */
+    --bg-dark: #000000;
+    --phase-gold: #BD9D64;
+    --text-light: #FFFFFF;
+    --text-dark: #000000;
+    
+    /* Additional professional colors */
+    --accent-hover: #D4B682;
+    --shadow-light: rgba(255, 255, 255, 0.1);
+    --shadow-dark: rgba(0, 0, 0, 0.5);
+    
+    /* Typography */
+    --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    
+    /* Transitions */
+    --transition-smooth: all 0.3s ease-in-out;
+}
+
+body {
+    font-family: var(--font-sans);
+    background-color: var(--bg-dark);
+    color: var(--text-light);
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+}
+
+/* ========================================
+   Container & Header
+   ======================================== */
+
+.container {
+    width: 100%;
+    max-width: 1400px;
+    text-align: center;
+}
+
+header {
+    margin-bottom: 3rem;
+}
+
+h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: var(--text-light);
+}
+
+.subtitle {
+    font-size: 1.2rem;
+    color: var(--phase-gold);
+    font-weight: 400;
+}
+
+/* ========================================
+   Process Container & Circle Layout
+   ======================================== */
+
+.process-container {
+    position: relative;
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    aspect-ratio: 1;
+}
+
+/* SVG for arrows - covers entire container */
+.arrows {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* Steps container - circular layout */
+.steps-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+/* ========================================
+   Individual Step Styling
+   ======================================== */
+
+.step {
+    position: absolute;
+    width: 280px;
+    cursor: default;
+    z-index: 10;
+}
+
+/* Step Number Badge */
+.step-number {
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 40px;
+    background-color: var(--phase-gold);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.2rem;
+    color: var(--text-dark);
+    z-index: 11;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Step Content Container */
+.step-content {
+    background-color: var(--phase-gold);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+}
+
+/* Step Header (Phase label + Title) */
+.step-header {
+    margin-bottom: 1rem;
+}
+
+.step-label {
+    font-size: 0.9rem;
+    font-weight: 400;
+    color: var(--text-dark);
+    display: block;
+    margin-bottom: 0.3rem;
+}
+
+.step-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin: 0;
+    line-height: 1.2;
+}
+
+/* Step Description Box */
+.step-description {
+    background-color: var(--text-light);
+    color: var(--text-dark);
+    padding: 1rem;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    text-align: left;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* ========================================
+   Circular Positioning of Steps
+   ======================================== */
+
+/* Step 1: Top */
+.step-1 {
+    top: 10%;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+/* Step 2: Right */
+.step-2 {
+    top: 50%;
+    right: 10%;
+    transform: translateY(-50%);
+}
+
+/* Step 3: Bottom */
+.step-3 {
+    bottom: 10%;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+/* Step 4: Left */
+.step-4 {
+    top: 50%;
+    left: 10%;
+    transform: translateY(-50%);
+}
+
+/* ========================================
+   Hover Effects & Interactions (Removed)
+   ======================================== */
+
+/* Hover effects removed as requested */
+.step:focus {
+    outline: 3px solid var(--accent-hover);
+    outline-offset: 4px;
+    border-radius: 12px;
+}
+
+/* ========================================
+   Responsive Design
+   ======================================== */
+
+/* Tablet */
+@media (max-width: 1024px) {
+    .process-container {
+        max-width: 700px;
+    }
+
+    .step {
+        width: 240px;
+    }
+
+    h1 {
+        font-size: 2rem;
+    }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    body {
+        padding: 1rem;
+    }
+
+    header {
+        margin-bottom: 2rem;
+    }
+
+    h1 {
+        font-size: 1.75rem;
+    }
+
+    .subtitle {
+        font-size: 1rem;
+    }
+
+    .process-container {
+        max-width: 100%;
+        min-height: 600px;
+    }
+
+    .step {
+        width: 200px;
+        padding: 0.5rem;
+    }
+
+    .step-content {
+        padding: 1rem;
+    }
+
+    .step-title {
+        font-size: 1.2rem;
+    }
+
+    .step-description {
+        font-size: 0.85rem;
+        padding: 0.75rem;
+    }
+
+    .step-number {
+        width: 35px;
+        height: 35px;
+        font-size: 1rem;
+        top: -15px;
+    }
+
+    /* Adjust positioning for smaller screens */
+    /* Positioning automatically adjusted for 4-step layout */
+}
+
+/* Very Small Mobile */
+@media (max-width: 480px) {
+    h1 {
+        font-size: 1.5rem;
+    }
+
+    .subtitle {
+        font-size: 0.9rem;
+    }
+
+    .step {
+        width: 180px;
+    }
+
+    .step-title {
+        font-size: 1.1rem;
+    }
+
+    .step-description {
+        font-size: 0.8rem;
+    }
+
+    .step-content {
+        padding: 0.75rem;
+    }
+}
+
+/* Print Styles */
+@media print {
+    body {
+        background: white;
+        color: black;
+    }
+
+    .step-content {
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+
+}
