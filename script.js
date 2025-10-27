@@ -171,17 +171,14 @@
         let angleDiff = toAngle - fromAngle;
         if (angleDiff < 0) angleDiff += 2 * Math.PI;
         
-        // Calculate midpoint angle for better control point placement
-        const midAngle = fromAngle + (angleDiff / 2);
+        // Calculate control points with moderate outward curve
+        // Use 1.15x radius for a subtle, elegant curve
+        const controlRadius = radius * 1.15;
         
-        // Calculate control points outward from center for a more circular arc
-        // Use a larger multiplier (1.5) for more pronounced curve
-        const controlRadius = radius * 1.5;
-        
-        // Control points positioned at angles between start and end
-        // This creates a more circular, less straight appearance
-        const controlAngle1 = fromAngle + (angleDiff * 0.33);
-        const controlAngle2 = fromAngle + (angleDiff * 0.67);
+        // Control points positioned at angles between start and end for smooth flow
+        // This creates a gentle circular arc without being too pronounced
+        const controlAngle1 = fromAngle + (angleDiff * 0.4);
+        const controlAngle2 = fromAngle + (angleDiff * 0.6);
         
         const control1X = centerX + Math.cos(controlAngle1) * controlRadius;
         const control1Y = centerY + Math.sin(controlAngle1) * controlRadius;
