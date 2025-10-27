@@ -134,20 +134,36 @@
         const angleIncrement = (2 * Math.PI) / numSteps;
         const startAngle = -Math.PI / 2;
         
-        // Generate arrows between consecutive steps
+        // Calculate arrow radius (circle minus offset)
+        const arrowRadius = radius - CONFIG.arrowOffset;
+        
+        // Generate arrows along the perfect circle
         for (let i = 0; i < numSteps; i++) {
             const currentAngle = startAngle + (angleIncrement * i);
             const nextAngle = startAngle + (angleIncrement * ((i + 1) % numSteps));
             
-            const path = createSmoothBezierArrow(
-                svgNS,
-                currentAngle,
-                nextAngle,
-                centerX,
-                centerY,
-                radius,
-                i
-            );
+            // Calculate start and end points on the circle
+            const startX = centerX + Math.cos(currentAngle) * arrowRadius;
+            const startY = centerY + Math.sin(currentAngle) * arrowRadius;
+            const endX = centerX + Math.cos(nextAngle) * arrowRadius;
+            const endY = centerY + Math.sin(nextAngle) * arrowRadius;
+            
+            // Create arc path along the circle
+            // Large arc flag: 0 for arcs < 180 degrees, 1 for arcs >= 180 degrees
+            const largeArcFlag = angleIncrement > Math.PI ? 1 : 0;
+            
+            // Create arc path (clockwise sweep)
+            const pathData = `M ${startX} ${startY} A ${arrowRadius} ${arrowRadius} 0 ${largeArcFlag} 1 ${endX} ${endY}`;
+            
+            // Create SVG path element
+            const path = document.createElementNS(svgNS, 'path');
+            path.setAttribute('d', pathData);
+            path.setAttribute('fill', 'none');
+            path.setAttribute('stroke', CONFIG.arrowColor);
+            path.setAttribute('stroke-width', CONFIG.arrowThickness);
+            path.setAttribute('marker-end', 'url(#arrowhead)');
+            path.classList.add('arrow-path');
+            path.dataset.stepIndex = i;
             
             arrowsSVG.appendChild(path);
         }
@@ -156,50 +172,7 @@
         attachArrowHoverEffects();
     }
 
-    /**
-     * Create a smooth curved arrow using cubic Bezier curves
-     */
-    function createSmoothBezierArrow(svgNS, fromAngle, toAngle, centerX, centerY, radius, stepIndex) {
-        // Calculate arrow start and end points with offset from card centers
-        const startX = centerX + Math.cos(fromAngle) * (radius - CONFIG.arrowOffset);
-        const startY = centerY + Math.sin(fromAngle) * (radius - CONFIG.arrowOffset);
-        
-        const endX = centerX + Math.cos(toAngle) * (radius - CONFIG.arrowOffset);
-        const endY = centerY + Math.sin(toAngle) * (radius - CONFIG.arrowOffset);
-        
-        // Calculate angle difference for proper curve direction
-        let angleDiff = toAngle - fromAngle;
-        if (angleDiff < 0) angleDiff += 2 * Math.PI;
-        
-        // Calculate control points with moderate outward curve
-        // Use 1.15x radius for a subtle, elegant curve
-        const controlRadius = radius * 1.15;
-        
-        // Control points positioned at angles between start and end for smooth flow
-        // This creates a gentle circular arc without being too pronounced
-        const controlAngle1 = fromAngle + (angleDiff * 0.4);
-        const controlAngle2 = fromAngle + (angleDiff * 0.6);
-        
-        const control1X = centerX + Math.cos(controlAngle1) * controlRadius;
-        const control1Y = centerY + Math.sin(controlAngle1) * controlRadius;
-        const control2X = centerX + Math.cos(controlAngle2) * controlRadius;
-        const control2Y = centerY + Math.sin(controlAngle2) * controlRadius;
-        
-        // Create cubic Bezier curve path
-        const pathData = `M ${startX} ${startY} C ${control1X} ${control1Y}, ${control2X} ${control2Y}, ${endX} ${endY}`;
-        
-        // Create SVG path element
-        const path = document.createElementNS(svgNS, 'path');
-        path.setAttribute('d', pathData);
-        path.setAttribute('fill', 'none');
-        path.setAttribute('stroke', CONFIG.arrowColor);
-        path.setAttribute('stroke-width', CONFIG.arrowThickness);
-        path.setAttribute('marker-end', 'url(#arrowhead)');
-        path.classList.add('arrow-path');
-        path.dataset.stepIndex = stepIndex;
-        
-        return path;
-    }
+    // createSmoothBezierArrow function removed - now using arc paths
 
     /**
      * Attach event listeners to steps
