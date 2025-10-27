@@ -167,14 +167,26 @@
         const endX = centerX + Math.cos(toAngle) * (radius - CONFIG.arrowOffset);
         const endY = centerY + Math.sin(toAngle) * (radius - CONFIG.arrowOffset);
         
-        // Calculate control points for smooth cubic Bezier curve
-        // Extend control points outward for more pronounced curve
-        const controlRadius = radius * 1.2;
+        // Calculate angle difference for proper curve direction
+        let angleDiff = toAngle - fromAngle;
+        if (angleDiff < 0) angleDiff += 2 * Math.PI;
         
-        const control1X = centerX + Math.cos(fromAngle) * controlRadius;
-        const control1Y = centerY + Math.sin(fromAngle) * controlRadius;
-        const control2X = centerX + Math.cos(toAngle) * controlRadius;
-        const control2Y = centerY + Math.sin(toAngle) * controlRadius;
+        // Calculate midpoint angle for better control point placement
+        const midAngle = fromAngle + (angleDiff / 2);
+        
+        // Calculate control points outward from center for a more circular arc
+        // Use a larger multiplier (1.5) for more pronounced curve
+        const controlRadius = radius * 1.5;
+        
+        // Control points positioned at angles between start and end
+        // This creates a more circular, less straight appearance
+        const controlAngle1 = fromAngle + (angleDiff * 0.33);
+        const controlAngle2 = fromAngle + (angleDiff * 0.67);
+        
+        const control1X = centerX + Math.cos(controlAngle1) * controlRadius;
+        const control1Y = centerY + Math.sin(controlAngle1) * controlRadius;
+        const control2X = centerX + Math.cos(controlAngle2) * controlRadius;
+        const control2Y = centerY + Math.sin(controlAngle2) * controlRadius;
         
         // Create cubic Bezier curve path
         const pathData = `M ${startX} ${startY} C ${control1X} ${control1Y}, ${control2X} ${control2Y}, ${endX} ${endY}`;
