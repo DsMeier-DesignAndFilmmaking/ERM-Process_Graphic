@@ -15,21 +15,26 @@ This project displays a circular process flow diagram representing the 4 phases 
 ## 🎨 Features
 
 ### Visual Design
-- **Color Scheme**: Black background with gold/tan phase boxes and white description boxes
+- **Color Scheme**: White background with gold/tan phase boxes and white description boxes
+- **Phase-Colored Arrows**: 4 distinct colored arrow segments:
+  - Phase 1: Blue (#4A90E2)
+  - Phase 2: Teal (#50E3C2)
+  - Phase 3: Orange (#F5A623)
+  - Phase 4: Red (#D0021B)
 - **Typography**: Clean sans-serif font with varying weights for hierarchy
 - **Layout**: Circular arrangement with steps positioned around the perimeter
 
 ### Interactive Features
-- **Hover Effects**: Steps scale up and change color on hover
-- **Animated Arrows**: Curved SVG arrows connecting each step
+- **Hover Effects**: Steps scale up and arrows thicken on hover
+- **Animated Arrows**: 4 quarter-circle SVG arrows with phase labels
 - **Responsive**: Adapts to different screen sizes
 - **Accessible**: Keyboard navigation and ARIA labels included
 
 ### Process Steps
-1. **Identification** - Phase 1
-2. **Assessment** - Phase 2
-3. **Migration** - Phase 3
-4. **Monitoring & Communication** - Phase 4
+1. **Identify** - Phase 1 (Blue)
+2. **Assess** - Phase 2 (Teal)
+3. **Mitigate** - Phase 3 (Orange)
+4. **Monitor** - Phase 4 (Red)
 
 ## 🚀 Getting Started
 
@@ -137,7 +142,8 @@ Edit the step content in `index.html`:
 
 ### Key Features Implementation
 - **Circular Layout**: CSS absolute positioning with calculated coordinates
-- **SVG Arrows**: Dynamically generated using Bezier curves
+- **SVG Arrows**: 4 quarter-circle arc paths with distinct colors per phase
+- **Phase Labels**: Dynamically positioned and rotated text labels
 - **Responsive Design**: CSS media queries and relative units
 - **Animations**: CSS transitions and transforms
 
